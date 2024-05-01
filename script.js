@@ -28,16 +28,25 @@ const Note = class {
         trashBtn.style.right = '15px'
         trashBtn.style.color = 'red'
         trashBtn.style.fontSize = '1.5rem'
+        trashBtn.style.cursor = 'pointer'
 
         noteBox.appendChild(textarea)
         noteBox.appendChild(trashBtn)
 
         const note = noteBox
+
+        this.deleteNote(trashBtn)
         return note     
     }
 
-    deleteNote (){
+    deleteNote (btn){
+        btn.addEventListener('click', ()=>{
+            btn.parentNode.remove();
+        })        
+    }
 
+    storeNotes (){
+        localStorage.setItem('note', this.myNote)
     }
 
 }
