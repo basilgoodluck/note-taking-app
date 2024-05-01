@@ -1,26 +1,54 @@
 const Note = class {
-    constructor (button, container, myNote) {
+    constructor (button, container) {
         this.button = button
         this.container = container
-        this.myNote = myNote
     }
 
     appendNote (){
-        this.container.append(this.noteBox())
+        const myNote = new NoteBox(this.container)
+        myNote.render()
+        this.container.appendChild(myNote.noteBox)
     }
 
-    noteBox (){
-        const noteBox = document.createElement('div')
+    storeNotes () {
+        const notes = document.querySelectorAll('.note-box')
+        const notesData = []
+        notes.forEach(note => {
+            notesData.push(note.querySelector('textarea').value)
+        })
+        localStorage.setItem('notes', JSON.stringify(notesData))
+    }
 
+    static retrieveNotes () {
+        const storedNotes = localStorage.getItem('notes')
+        if (storedNotes) {
+            const notesData = JSON.parse(storedNotes)
+            const container = document.getElementById('container')
+            notesData.forEach(noteData => {
+                const myNote = new NoteBox(container, noteData)
+                myNote.render()
+                container.appendChild(myNote.noteBox)
+            })
+        }
+    }
+}
+
+class NoteBox {
+    constructor(container, note = '') {
+        this.container = container
+        this.note = note
+    }
+
+    render() {
+        const noteBox = document.createElement('div')
         noteBox.classList.add('note-box')
         noteBox.style.position = 'relative'
         noteBox.style.transition = 'ease .5s'
 
         const textarea = document.createElement('textarea')
-        this.myNote = textarea.value
+        textarea.value = this.note
 
         const trashBtn = document.createElement('i')
-
         trashBtn.classList.add('fa')
         trashBtn.classList.add('fa-trash')
         trashBtn.style.position = 'absolute'
@@ -33,22 +61,17 @@ const Note = class {
         noteBox.appendChild(textarea)
         noteBox.appendChild(trashBtn)
 
-        const note = noteBox
+        this.noteBox = noteBox
 
         this.deleteNote(trashBtn)
-        return note     
     }
 
     deleteNote (btn){
-        btn.addEventListener('click', ()=>{
-            btn.parentNode.remove();
-        })        
+        btn.addEventListener('click', () => {
+            this.noteBox.remove()
+            Note.prototype.storeNotes()
+        })
     }
-
-    storeNotes (){
-        localStorage.setItem('note', this.myNote)
-    }
-
 }
 
 const btn = document.getElementById('btn-add')
@@ -56,6 +79,11 @@ const container = document.getElementById('container')
 
 const note = new Note(btn, container)
 
-btn.addEventListener('click', ()=>{
+btn.addEventListener('click', () => {
     note.appendNote()
+    note.storeNotes()
+})
+
+window.addEventListener('load', () => {
+    Note.retrieveNotes()
 })
