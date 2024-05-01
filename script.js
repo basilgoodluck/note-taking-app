@@ -46,9 +46,12 @@ class NoteBox {
         noteBox.style.transition = 'ease .5s'
 
         const textarea = document.createElement('textarea')
+        
+        textarea.style.fontSize = '1.3rem'
         textarea.value = this.note
 
         const trashBtn = document.createElement('i')
+
         trashBtn.classList.add('fa')
         trashBtn.classList.add('fa-trash')
         trashBtn.style.position = 'absolute'
